@@ -2,5 +2,102 @@
 title: "Two-Parameters"
 author: "DK"
 format: html
+execute: 
+  echo: false
 ---
 
+```{r}
+#| message: false
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+```
+
+```{r}
+set.seed(10)
+
+x <- nhanes |>
+  filter(age >= 18 & age <= 27) |>
+  select(height, sex) |>
+  drop_na() |>
+  slice_sample(n = 50)
+```
+
+```{r}
+#| cache: true
+
+fit_height <- linear_reg() |>
+  fit(height ~ sex, data = x)
+```
+```{r}
+#| message: false
+library(gt)
+library(marginaleffects)
+
+# Tidy the fitted model and select relevant columns
+tidy_table <- tidy(fit_height, conf.int = TRUE) |>
+  select(term, estimate, conf.low, conf.high) |>
+  mutate(across(estimate:conf.high, \(x) round(x, 2))) # ✅ updated here
+
+# Create a clean table
+tidy_table |>
+  gt() |>
+  tab_header(
+    title = "Estimated Coefficients for Height Model",
+    subtitle = "With 95% Confidence Intervals"
+  ) |>
+  cols_label(
+    term = "Term",
+    estimate = "Estimate",
+    conf.low = "Lower CI",
+    conf.high = "Upper CI"
+  ) |>
+  tab_source_note(source_note = "Source: NHANES data, 2009–2011") |>
+  opt_table_lines(extent = "none")
+
+```
+
+```{r}
+
+# Get predicted values without plotting
+pred_data <- plot_predictions(fit_height, condition = "sex", draw = FALSE)
+```
+
+```{r}
+library(ggplot2)
+ggplot(pred_data, aes(x = sex, y = estimate, fill = sex)) +
+  geom_col(width = 0.6, color = "black", show.legend = FALSE) +
+  geom_errorbar(
+    aes(ymin = conf.low, ymax = conf.high),
+    width = 0.2,
+    color = "black"
+  ) +
+  scale_fill_manual(values = c("Female" = "#74add1", "Male" = "#f46d43")) +
+  labs(
+    title = "Predicted Height by Sex (Age 18–27)",
+    subtitle = "On average, males are about 16 cm taller than females in this NHANES sample",
+    x = "Sex",
+    y = "Predicted Height (cm)",
+    caption = "Source: NHANES 2009–2011 via CDC"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 13, hjust = 0.5),
+    plot.caption = element_text(size = 10, hjust = 1, color = "gray40"),
+    axis.title.x = element_text(size = 13),
+    axis.title.y = element_text(size = 13),
+    axis.text = element_text(size = 12)
+  )
+
+```
+$$
+Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + \epsilon_i
+$$
+
+$$
+\hat{height}_i = 170.2 + 7.6 \cdot \text{sex}_i
+$$
+
+We model height—defined as the measured physical stature of individuals in centimeters as a linear function of sex, where sex is a binary variable indicating male or female. The goal is to estimate how much of the variation in height can be explained by sex differences. This simple linear model allows us to estimate the average height for each sex and the average difference in height between them. While the model captures this specific relationship, it does not include other potential covariates like age, nutrition, or ethnicity, which may also influence height. One potential weakness in our model is that it assumes the NHANES sample is fully representative of USMC recruits, even though differences in age, sex, fitness level, or socioeconomic background may violate this assumption.One quantity of interest is the difference in predicted average height between males and females, estimated to be approximately 15.94 cm, with a 95% confidence interval ranging from 12.32 cm to 19.56 cm, indicating a statistically significant gender-based height difference in the sample.
