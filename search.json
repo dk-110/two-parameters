@@ -1,0 +1,9 @@
+[
+  {
+    "objectID": "analysis.html",
+    "href": "analysis.html",
+    "title": "Two-Parameters",
+    "section": "",
+    "text": "Estimated Coefficients for Height Model\n\n\nWith 95% Confidence Intervals\n\n\nTerm\nEstimate\nLower CI\nUpper CI\n\n\n\n\n(Intercept)\n162.18\n159.72\n164.63\n\n\nsexMale\n15.94\n12.32\n19.56\n\n\n\nSource: NHANES data, 2009–2011\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\\[\nY_i = \\beta_0 + \\beta_1 X_{1i} + \\beta_2 X_{2i} + \\cdots + \\beta_k X_{ki} + \\epsilon_i\n\\]\n\\[\n\\hat{height}_i = 170.2 + 7.6 \\cdot \\text{sex}_i\n\\]\nWe model height—defined as the measured physical stature of individuals in centimeters as a linear function of sex, where sex is a binary variable indicating male or female. The goal is to estimate how much of the variation in height can be explained by sex differences. This simple linear model allows us to estimate the average height for each sex and the average difference in height between them. While the model captures this specific relationship, it does not include other potential covariates like age, nutrition, or ethnicity, which may also influence height. One potential weakness in our model is that it assumes the NHANES sample is fully representative of USMC recruits, even though differences in age, sex, fitness level, or socioeconomic background may violate this assumption.One quantity of interest is the difference in predicted average height between males and females, estimated to be approximately 15.94 cm, with a 95% confidence interval ranging from 12.32 cm to 19.56 cm, indicating a statistically significant gender-based height difference in the sample."
+  }
+]
